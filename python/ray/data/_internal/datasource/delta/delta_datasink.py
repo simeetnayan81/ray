@@ -620,9 +620,10 @@ class DeltaDatasink(Datasink[List["AddAction"]]):
                 min_val = pc.min(column).as_py()
                 max_val = pc.max(column).as_py()
                 # Ensure string representation for JSON serialization
+                # Use explicit 'is not None' check to preserve falsy values like ""
                 return (
-                    str(min_val) if min_val else None,
-                    str(max_val) if max_val else None,
+                    str(min_val) if min_val is not None else None,
+                    str(max_val) if max_val is not None else None,
                 )
 
             # Unsupported type for min/max
