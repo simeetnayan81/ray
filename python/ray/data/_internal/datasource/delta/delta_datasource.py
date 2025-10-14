@@ -179,9 +179,6 @@ class DeltaDatasource(Datasource):
             if self.version is not None and not self.cdf:
                 dt_kwargs["version"] = self.version
 
-            # Enable deletion vector handling for correctness
--            dt_kwargs["options"] = {"ignore_deletion_vectors": False}
-
             self._delta_table = DeltaTable(self.path, **dt_kwargs)
 
         return self._delta_table
