@@ -24,12 +24,14 @@ def convert_pyarrow_filter_to_sql(
         elif isinstance(value, bool):
             return "TRUE" if value else "FALSE"
         elif isinstance(value, str):
-            return f"'{value.replace(\"'\", \"''\")}'"
+            escaped = value.replace("'", "''")
+            return f"'{escaped}'"
         elif isinstance(value, (int, float)):
             return str(value)
         else:
             str_value = str(value)
-            return f"'{str_value.replace(\"'\", \"''\")}'"
+            escaped = str_value.replace("'", "''")
+            return f"'{escaped}'"
 
     def format_condition(col: str, op: str, value: Any) -> str:
         """Format a single filter condition as SQL expression."""
