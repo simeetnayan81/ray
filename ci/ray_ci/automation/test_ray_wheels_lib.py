@@ -176,8 +176,7 @@ def test_download_ray_wheels_from_s3_with_branch(
         assert mock_download_wheel.call_count == len(SAMPLE_WHEELS)
         for i, call_args in enumerate(mock_download_wheel.call_args_list):
             assert (
-                call_args[0][0]
-                == f"custom_branch/{commit_hash}/{SAMPLE_WHEELS[i]}.whl"
+               call_args[0][0] == f"custom_branch/{commit_hash}/{SAMPLE_WHEELS[i]}.whl"
             )
             assert call_args[0][1] == tmp_dir
 
@@ -264,12 +263,12 @@ def test_download_ray_wheels_from_s3_fail_download(
 
 def test_add_build_tag_to_wheel():
     with tempfile.TemporaryDirectory() as tmp_dir:
-        wheel_name = "ray-1.0.0-cp312-cp312-manylinux2014_x86_64.whl"
+        wheel_name = "ray-1.0.0-cp39-cp39-manylinux2014_x86_64.whl"
         wheel_path = os.path.join(tmp_dir, wheel_name)
         with open(wheel_path, "w") as f:
             f.write("")
         add_build_tag_to_wheel(wheel_path=wheel_path, build_tag="123")
-        expected_wheel_name = "ray-1.0.0-123-cp312-cp312-manylinux2014_x86_64.whl"
+        expected_wheel_name = "ray-1.0.0-123-cp39-cp39-manylinux2014_x86_64.whl"
         expected_wheel_path = os.path.join(tmp_dir, expected_wheel_name)
         assert os.path.exists(expected_wheel_path)
 
