@@ -86,25 +86,42 @@ def readLicenseFile(path):
     with open(path, 'r', encoding='utf-8', errors='replace') as file:
         return bad_chars.sub('', file.read())
 
-def run_askalono(dependencies):
+def askalono_crawl(dependency):
+    license_text = subprocess.run(f"askalono crawl {bazel_output_base}/external/{dependency}", capture_output=True, text=True, shell=True).stdout.strip()
+    return license_text
+
+def askalono_crawl_licenses(dependency):
+    license_text = subprocess.run(f"askalono crawl {bazel_output_base}/external/{dependency}/**LICENSE*", capture_output=True, text=True, shell=True).stdout.strip()
+    return license_text
+
+def askalono_crawl_copying(dependency):
+    copying_text = subprocess.run(f"askalono crawl {bazel_output_base}/external/{dependency}/**COPYING**", capture_output=True, text=True, shell=True).stdout.strip()
+    return copying_text
+
+def get_askalono_results(dependencies):
     license_info = []
     askalono_pattern = re.compile(r'^(\/[^\n]+)\nLicense:\s*([^\n]+)\nScore:\s*([0-9.]+)', re.M)
     for dependency in dependencies:
         license_text = subprocess.run(f"askalono crawl {bazel_output_base}/external/{dependency}", capture_output=True, text=True, shell=True).stdout.strip()
-        licenses = [
-            {"dependency": dependency, "path": m.group(1).replace(f"{bazel_output_base}/external/", ""), "license": m.group(2).strip(), "score": float(m.group(3)), "content": readLicenseFile(m.group(1))}
-            for m in askalono_pattern.finditer(license_text)
-        ]
-        license_info.extend(licenses)
-        if not licenses:
+        if not license_text:
+            license_text = askalono_crawl_licenses(dependency)
+        if not license_text:
+            license_text = askalono_crawl_copying(dependency)
+        if not license_text:
             logger.warning(f"No license text found for {dependency}")
-            licenses.append({
+            license_info.append({
                 "dependency": dependency,
                 "path": "unknown",
                 "license": "unknown",
                 "score": "0.0",
                 "content": "unknown"
             })
+            continue
+        licenses = [
+            {"dependency": dependency, "path": m.group(1).replace(f"{bazel_output_base}/external/", ""), "license": m.group(2).strip(), "score": float(m.group(3)), "content": readLicenseFile(m.group(1))}
+            for m in askalono_pattern.finditer(license_text)
+        ]
+        license_info.extend(licenses)
     return license_info
 
 
@@ -153,15 +170,14 @@ Examples:
         logger.debug(f"Dependency: {dependency}")
 
     output_folder = args.output
-    # copy_files(file_paths)
-    # copy_licenses(package_names)
+    copy_files(file_paths)
+    copy_licenses(package_names)
     
     if args.askalono:
-        askalono_results = run_askalono(package_names)
+        askalono_results = get_askalono_results(package_names)
         with open(f"{output_folder}/output.json", "w") as file:
             json.dump(askalono_results, file, indent=4)
         df = pd.DataFrame(askalono_results)
-        # exploded_df = df.explode('licenses', ignore_index=False)
         df.to_excel(f"{output_folder}/askalono_results.xlsx", index=False)
 
     print("Bazel Install Base Path:")
