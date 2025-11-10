@@ -93,7 +93,8 @@ register_toolchains("//bazel:py39_toolchain")
 
 register_execution_platforms(
     "@local_config_platform//:host",
-    "//:hermetic_python_platform",
+    "//:py39_platform",
+    "//:py310_platform",
 )
 
 http_archive(

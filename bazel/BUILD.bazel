@@ -79,7 +79,7 @@ py_runtime_pair(
 
 toolchain(
     name = "py39_toolchain",
-    exec_compatible_with = ["//:hermetic_python"],
+    exec_compatible_with = ["//:py39"],
     toolchain = ":py39_runtime_pair",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
@@ -100,7 +100,7 @@ py_runtime_pair(
 
 toolchain(
     name = "py310_toolchain",
-    exec_compatible_with = ["//:hermetic_python"],
+    exec_compatible_with = ["//:py310"],
     toolchain = ":py310_runtime_pair",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
