@@ -81,7 +81,7 @@ py_runtime_pair(
 
 toolchain(
     name = "py39_toolchain",
-    exec_compatible_with = ["//:py39"],
+    exec_compatible_with = ["//bazel:py39"],
     toolchain = ":py39_runtime_pair",
     toolchain_type = "@bazel_tools//tools/python:toolchain_type",
 )
